@@ -1,0 +1,15 @@
+storage = "./storage"
+timeout = "10s"
+batch = 20
+
+[forward.fluentd]
+#ca = "/opt/teleport-plugin/ca.crt"
+#cert = "/opt/teleport-plugin/client.crt"
+#key = "/opt/teleport-plugin/client.key"
+url = "http://logstash:9000/test.log"
+session-url = "http://logstash:9000/session"
+
+[teleport]
+addr = "teleport-daemon:3025"
+identity = "identity"
+refresh.enabled = true

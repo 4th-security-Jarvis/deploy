@@ -1,0 +1,10 @@
+{
+  "index_patterns": ["audit-events-*"],
+  "template": {
+    "settings": {},
+    "mappings": {
+      "dynamic":"true"
+    }
+  }
+}
+

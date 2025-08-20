@@ -1,0 +1,7 @@
+- pipeline.id: main
+  path.config: "/usr/share/logstash/pipeline/logstash.conf"
+  pipeline.ecs_compatibility: disabled
+
+- pipeline.id: enriched-sessions
+  path.config: "/usr/share/logstash/pipeline/enriched-session-logs.conf"
+

@@ -1,0 +1,128 @@
+version: '3.8'
+
+services:
+  # 1) Teleport daemon (followed the user's example run command)
+  teleport-daemon:
+    image: public.ecr.aws/gravitational/teleport-distroless-debug:17.5.4
+    container_name: teleport-daemon
+    networks:
+      - teleport-net
+    volumes:
+      - ./teleport-daemon/config:/etc/teleport:ro
+      - ./teleport-daemon/data:/var/lib/teleport
+      - ./teleport-daemon/keys/fullchain.pem:/etc/letsencrypt/live/openswdev.duckdns.org/fullchain.pem:ro
+      - ./teleport-daemon/keys/privkey.pem:/etc/letsencrypt/live/openswdev.duckdns.org/privkey.pem:ro
+    ports:
+      - "3025:3025"
+      - "3080:3080"
+    # keep container running so other services (tbot, backend) can interact with its files
+    entrypoint: [ "tail", "-f", "/dev/null" ]
+
+  # 2) Backend - build from repo and run (uses the provided Dockerfile)
+  backend:
+    build:
+      context: ./4th-security-Jarvis-BE
+      dockerfile: Dockerfile
+    image: jarvis_backend:latest
+    depends_on:
+      - teleport-daemon
+    networks:
+      - teleport-net
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env.backend
+    environment:
+      # defaults/placeholders; set in .env.backend for production
+      - TELEPORT_PROXY_ADDR=teleport-daemon:3080
+      - TELEPORT_AUTH_ADDR=teleport-daemon:3025
+      - CERT_FILE=/etc/letsencrypt/live/openswdev.duckdns.org/fullchain.pem
+      - KEY_FILE=/etc/letsencrypt/live/openswdev.duckdns.org/privkey.pem
+      - TBOT_IDENTITY_FILE_PATH=/var/lib/teleport/tbot/identity
+    volumes:
+      - ./teleport-daemon/keys:/etc/letsencrypt/live/openswdev.duckdns.org:ro
+      - ./teleport-daemon/data:/var/lib/teleport
+
+  # 3) Frontend - multi-stage build (build then serve with nginx)
+  frontend:
+    build:
+      context: ./4th-security-Jarvis-FE
+      dockerfile: Dockerfile
+    image: jarvis_frontend:latest
+    depends_on:
+      - backend
+    networks:
+      - teleport-net
+    ports:
+      - "3000:80" # host:container -> container runs nginx on 80
+
+  # 4) ELK stack and event handler (from user-provided example)
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.18.1
+    environment:
+      - discovery.type=single-node
+      - ES_JAVA_OPTS=-Xms1g -Xmx1g
+      - xpack.security.enabled=false
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+    networks:
+      - teleport-net
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:9200" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:8.18.1
+    volumes:
+      - ./logstash/config:/usr/share/logstash/config
+      - ./logstash/pipeline:/usr/share/logstash/pipeline
+      - ./plugin:/home
+    networks:
+      - teleport-net
+    extra_hosts:
+      - "openswdev.duckdns.org:172.18.0.4"
+    depends_on:
+      - elasticsearch
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.18.1
+    ports:
+      - "5601:5601"
+    volumes:
+      - ./kibana/kibana.yml:/usr/share/kibana/config/kibana.yml:ro
+      - ./teleport-daemon/keys:/etc/letsencrypt/live/openswdev.duckdns.org/:ro
+    networks:
+      - teleport-net
+    depends_on:
+      - elasticsearch
+
+  tp-event-handler:
+    image: public.ecr.aws/gravitational/teleport-plugin-event-handler:17.7.1
+    volumes:
+      - ./plugin:/opt/teleport-plugin
+      # if you keep certificates in a docker volume, adapt this mapping
+      - tbot-certs-volume:/opt/teleport-plugin/identity
+    working_dir: /opt/teleport-plugin
+    networks:
+      - teleport-net
+    depends_on:
+      - logstash
+    command: [ "start", "--config=teleport-event-handler.toml" ]
+
+volumes:
+  esdata:
+  tbot-certs-volume:
+
+
+networks:
+  teleport-net:
+    driver: bridge
+
+# Notes:
+# - Create a file named .env.backend next to this compose file and add required env vars
+#   (JWT_SECRET_KEY, GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, GITHUB_CALLBACK_URL,
+#    TELEPORT_AUDIT_LOG_PATH, GCP_PROJECT_ID, GCP_LOCATION, GEMINI_MODEL, TBOT_IDENTITY_FILE_PATH)
+# - Adjust file paths under ./teleport-daemon (config, data, keys) to match your host layout.
+# - The backend Dockerfile expects to find tbot.yaml.template and will run tbot via entrypoint.

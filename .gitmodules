@@ -1,0 +1,6 @@
+[submodule "4th-security-Jarvis-BE"]
+  path = 4th-security-Jarvis-BE
+  url  = https://github.com/DguFarmSystem/4th-security-Jarvis-BE
+[submodule "4th-security-Jarvis-FE"]
+  path = 4th-security-Jarvis-FE
+  url  = https://github.com/DguFarmSystem/4th-security-Jarvis-FE

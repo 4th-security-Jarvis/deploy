@@ -1,0 +1,41 @@
+version: v3
+teleport:
+  nodename: 28a6ee42ea10
+  data_dir: /var/lib/teleport
+  log:
+    output: stderr
+    severity: INFO
+    format:
+      output: text
+  ca_pin: ""
+  diag_addr: ""
+auth_service:
+  enabled: "yes"
+  listen_addr: 0.0.0.0:3025
+  session_recording: "proxy"
+  proxy_listener_mode: multiplex
+  public_addr:
+    - "teleport-daemon:3025"
+ssh_service:
+  enabled: "yes"
+  commands:
+  - name: hostname
+    command: [hostname]
+    period: 1m0s
+app_service:
+  enabled: true
+  apps:
+    - name: grafana
+      uri: "http://grafana:3333"
+      labels:
+        env: "test"
+proxy_service:
+  enabled: "yes"
+  public_addr: openswdev.duckdns.org:3080
+
+  https_keypairs:
+    - cert_file: /etc/letsencrypt/live/openswdev.duckdns.org/fullchain.pem
+      key_file: /etc/letsencrypt/live/openswdev.duckdns.org/privkey.pem
+
+  https_keypairs_reload_interval: 0s
+  acme: {}

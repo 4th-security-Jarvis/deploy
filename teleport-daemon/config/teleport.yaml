@@ -22,20 +22,13 @@ ssh_service:
   - name: hostname
     command: [hostname]
     period: 1m0s
-app_service:
-  enabled: true
-  apps:
-    - name: grafana
-      uri: "http://grafana:3333"
-      labels:
-        env: "test"
 proxy_service:
   enabled: "yes"
   public_addr: openswdev.duckdns.org:3080
 
   https_keypairs:
-    - cert_file: /etc/letsencrypt/live/openswdev.duckdns.org/fullchain.pem
-      key_file: /etc/letsencrypt/live/openswdev.duckdns.org/privkey.pem
+    - cert_file: /etc/keys/fullchain.pem
+      key_file: /etc/keys/privkey.pem
 
   https_keypairs_reload_interval: 0s
   acme: {}

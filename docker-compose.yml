@@ -8,22 +8,20 @@ services:
     networks:
       - teleport-net
     volumes:
-      - ./teleport-daemon/config:/etc/teleport:ro
+      - ./teleport-daemon/config:/etc/teleport
       - ./teleport-daemon/data:/var/lib/teleport
-      - ./teleport-daemon/keys/fullchain.pem:/etc/letsencrypt/live/openswdev.duckdns.org/fullchain.pem:ro
-      - ./teleport-daemon/keys/privkey.pem:/etc/letsencrypt/live/openswdev.duckdns.org/privkey.pem:ro
+      - ./teleport-daemon/keys:/etc/keys:ro
     ports:
       - "3025:3025"
       - "3080:3080"
-    # keep container running so other services (tbot, backend) can interact with its files
-    entrypoint: [ "tail", "-f", "/dev/null" ]
+    entrypoint: [ "teleport", "start", "--config=/etc/teleport/teleport.yaml" ]
 
   # 2) Backend - build from repo and run (uses the provided Dockerfile)
   backend:
     build:
       context: ./4th-security-Jarvis-BE
       dockerfile: Dockerfile
-    image: jarvis_backend:latest
+    image: backend:latest
     depends_on:
       - teleport-daemon
     networks:
@@ -31,7 +29,7 @@ services:
     ports:
       - "8080:8080"
     env_file:
-      - .env.backend
+      - .env
     environment:
       # defaults/placeholders; set in .env.backend for production
       - TELEPORT_PROXY_ADDR=teleport-daemon:3080

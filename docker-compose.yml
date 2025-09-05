@@ -30,16 +30,10 @@ services:
       - "8080:8080"
     env_file:
       - .env
-    environment:
-      # defaults/placeholders; set in .env.backend for production
-      - TELEPORT_PROXY_ADDR=teleport-daemon:3080
-      - TELEPORT_AUTH_ADDR=teleport-daemon:3025
-      - CERT_FILE=/etc/letsencrypt/live/openswdev.duckdns.org/fullchain.pem
-      - KEY_FILE=/etc/letsencrypt/live/openswdev.duckdns.org/privkey.pem
-      - TBOT_IDENTITY_FILE_PATH=/var/lib/teleport/tbot/identity
     volumes:
-      - ./teleport-daemon/keys:/etc/letsencrypt/live/openswdev.duckdns.org:ro
+      - ./teleport-daemon/keys:/etc/keys:ro
       - ./teleport-daemon/data:/var/lib/teleport
+      - tbot-certs-volume:/opt/machine-id
 
   # 3) Frontend - multi-stage build (build then serve with nginx)
   frontend:
@@ -54,7 +48,7 @@ services:
     ports:
       - "3000:80" # host:container -> container runs nginx on 80
 
-  # 4) ELK stack and event handler (from user-provided example)
+  # 4) ELK stack and event handler
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.18.1
     environment:
@@ -100,7 +94,6 @@ services:
     image: public.ecr.aws/gravitational/teleport-plugin-event-handler:17.7.1
     volumes:
       - ./plugin:/opt/teleport-plugin
-      # if you keep certificates in a docker volume, adapt this mapping
       - tbot-certs-volume:/opt/teleport-plugin/identity
     working_dir: /opt/teleport-plugin
     networks:

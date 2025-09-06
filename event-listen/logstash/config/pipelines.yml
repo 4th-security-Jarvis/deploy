@@ -1,7 +1,6 @@
 - pipeline.id: main
   path.config: "/usr/share/logstash/pipeline/logstash.conf"
-  pipeline.ecs_compatibility: disabled
+  pipeline.ecs_compatibility: disabled #한번 빼보는거 해보고싶음 - ecs표준으로 필드 변환해주는 옵션.
 
 - pipeline.id: enriched-sessions
   path.config: "/usr/share/logstash/pipeline/enriched-session-logs.conf"
-

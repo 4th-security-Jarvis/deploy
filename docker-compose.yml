@@ -59,22 +59,14 @@ services:
       - esdata:/usr/share/elasticsearch/data
     networks:
       - teleport-net
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:9200" ]
-      interval: 10s
-      timeout: 5s
-      retries: 10
 
   logstash:
     image: docker.elastic.co/logstash/logstash:8.18.1
     volumes:
-      - ./logstash/config:/usr/share/logstash/config
-      - ./logstash/pipeline:/usr/share/logstash/pipeline
+      - ./logstash:/usr/share/logstash
       - ./plugin:/home
     networks:
       - teleport-net
-    extra_hosts:
-      - "openswdev.duckdns.org:172.18.0.4"
     depends_on:
       - elasticsearch
 
@@ -84,7 +76,7 @@ services:
       - "5601:5601"
     volumes:
       - ./kibana/kibana.yml:/usr/share/kibana/config/kibana.yml:ro
-      - ./teleport-daemon/keys:/etc/letsencrypt/live/openswdev.duckdns.org/:ro
+      - ./teleport-daemon/keys:/etc/keys:ro
     networks:
       - teleport-net
     depends_on:
@@ -94,7 +86,7 @@ services:
     image: public.ecr.aws/gravitational/teleport-plugin-event-handler:17.7.1
     volumes:
       - ./plugin:/opt/teleport-plugin
-      - tbot-certs-volume:/opt/teleport-plugin/identity
+      - tbot-certs-volume/identity:/opt/teleport-plugin/identity:ro
     working_dir: /opt/teleport-plugin
     networks:
       - teleport-net
@@ -110,10 +102,3 @@ volumes:
 networks:
   teleport-net:
     driver: bridge
-
-# Notes:
-# - Create a file named .env.backend next to this compose file and add required env vars
-#   (JWT_SECRET_KEY, GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, GITHUB_CALLBACK_URL,
-#    TELEPORT_AUDIT_LOG_PATH, GCP_PROJECT_ID, GCP_LOCATION, GEMINI_MODEL, TBOT_IDENTITY_FILE_PATH)
-# - Adjust file paths under ./teleport-daemon (config, data, keys) to match your host layout.
-# - The backend Dockerfile expects to find tbot.yaml.template and will run tbot via entrypoint.

@@ -29,20 +29,13 @@ fi
 
 echo "JOIN_TOKEN=$JOIN_TOKEN" > .env
 
-# 백엔드 코드에서 사용되는 마스터 유저 생성은 사용자가 직접하면 된다.
-
 # 백엔드 서비스 시작
 docker-compose up -d backend
 
+# 백엔드 코드에서 사용되는 마스터 유저 생성은 사용자가 직접하면 된다.
+
 # ELK + plubin 서비스 시작
-docker-compose up -d logstash elasticsearch kibana
-
-# ELK 서비스 준비 대기
-until curl -s http://localhost:5601 > /dev/null; do
-  echo "Waiting for Kibana to be ready..."
-  sleep 2
-done
-
-echo "ELK services are up and running."
+# 해보고 서비스 연결이 잘 안되면 health check 추가해야함
+docker-compose up -d logstash elasticsearch kibana tp-event-handler
 
 # 프론트 서비스 시작

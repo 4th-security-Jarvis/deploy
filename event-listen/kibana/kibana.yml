@@ -1,7 +1,7 @@
-# kibana.yml 예시
-
 elasticsearch.hosts: ["http://elasticsearch:9200"]
 
+#kibana 컨테이너 내부에서 명령어로 생성한 암호화 키이다
+#elastic과 암호화된 통신을 위해 사용되며 한번 생성해서 여러 환경에서 사용해도 상관 없다.
 xpack.encryptedSavedObjects.encryptionKey: "3c546b07636a035f4264eb198e49d035"
 xpack.reporting.encryptionKey: "4e3b02b5e8d83c3348b628d115d96e32"
 xpack.security.encryptionKey: "933d2b48e7d7fe4e7b9d66fa6a1a5b17"
@@ -9,5 +9,5 @@ xpack.security.encryptionKey: "933d2b48e7d7fe4e7b9d66fa6a1a5b17"
 server.host: "0.0.0.0"
 
 server.ssl.enabled: true
-server.ssl.certificate: /etc/letsencrypt/live/openswdev.duckdns.org/fullchain.pem
-server.ssl.key: /etc/letsencrypt/live/openswdev.duckdns.org/privkey.pem
+server.ssl.certificate: /etc/keys/fullchain.pem
+server.ssl.key: /etc/keys/privkey.pem

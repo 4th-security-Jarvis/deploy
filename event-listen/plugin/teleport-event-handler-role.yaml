@@ -1,3 +1,5 @@
+# 이 역할 파일은 start_script.sh 에서 초기 이벤트리스너에서 필요한 봇 생성을 위한 역할 생성에서 사용된다.
+
 kind: role
 metadata:
   name: teleport-event-handler

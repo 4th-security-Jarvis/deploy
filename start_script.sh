@@ -1,6 +1,12 @@
 #!/bin/bash
 set -e
 
+sudo apt-get update
+sudo apt-get install -y docker.io docker-compose
+
+sudo systemctl start docker
+sudo systemctl enable docker
+
 # 텔레포트 데몬으로 시작
 docker-compose up -d teleport-daemon
 

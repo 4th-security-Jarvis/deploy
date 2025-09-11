@@ -139,3 +139,31 @@ docker-compose logs --tail 200 backend
 6. [ ] `docker-compose up -d`로 스택 시작
 
 ---
+
+
+설치 가이드
+
+인스턴스 생성, 방화벽 설정(80,5601,8080,3080), 도메인 생성
+
+sudo apt-get update
+sudo apt-get install -y git,certbot,docker.io,docker-compose
+git clone https://github.com/4th-security-Jarvis/deploy.git
+cd deploy
+git submodule update --init
+.env파일 수정
+(gemini api 키, github sso, 조직생성)
+
+sudo certbot certonly --standalone \
+  -d install-test.duckdns.org \
+  --non-interactive \
+  --agree-tos \
+  --email (본인꺼)
+
+./teleport-daemon/keys에 생성된 키파일 2개 붙여넣기
+
+sudo systemctl start docker // 안해도될까?
+sudo systemctl enable docker // 안해도될까?
+sudo chmod 666 /var/run/docker.sock
+
+sudo chmod +x start_script.sh
+./start_script.sh

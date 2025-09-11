@@ -88,7 +88,7 @@ services:
     image: public.ecr.aws/gravitational/teleport-plugin-event-handler:17.7.1
     volumes:
       - ./plugin:/opt/teleport-plugin
-      - tbot-certs-volume/identity:/opt/teleport-plugin/identity:ro
+      - tbot-certs-volume:/opt/teleport-plugin/identity:ro
     working_dir: /opt/teleport-plugin
     networks:
       - teleport-net

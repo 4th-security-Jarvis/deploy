@@ -1,24 +1,19 @@
 #!/bin/bash
 set -e
 
-sudo apt-get update
-sudo apt-get install -y docker.io docker-compose
-
-sudo systemctl start docker
-sudo systemctl enable docker
-
 # 텔레포트 데몬으로 시작
 docker-compose up -d teleport-daemon
 
 # 텔레포트 서비스 HTTP(3080) 준비 대기 (curl 또는 nc 등 활용)
-until curl -s http://localhost:3080 > /dev/null; do
+until ! curl -s http://localhost:3080 > /dev/null; do
   echo "Waiting for teleport-daemon to be ready..."
   sleep 2
 done
+//헬스체크 잘 안됨 고쳐야함
 
 # 텔레포트 역할 생성
 if ! docker exec teleport-daemon tctl get role teleport-event-handler > /dev/null 2>&1; then
-  docker exec teleport-daemon tctl create -f event-listen/plugin/teleport-event-handler-role.yaml
+  docker exec teleport-daemon tctl create -f etc/teleport/teleport-event-handler-role.yaml
   echo "Role teleport-event-handler created."
 else
   echo "Role teleport-event-handler already exists."
@@ -33,7 +28,9 @@ if [ -z "$JOIN_TOKEN" ]; then
   exit 1
 fi
 
-echo "JOIN_TOKEN=$JOIN_TOKEN" > .env
+echo "JOIN_TOKEN=$JOIN_TOKEN" >> .env
+
+//여기까지 했음
 
 # 백엔드 서비스 시작
 docker-compose up -d backend

@@ -8,5 +8,5 @@ session-url = "http://logstash:9000/session"
 
 [teleport]
 addr = "teleport-daemon:3025"
-identity = "identity"
+identity = "identity/identity"
 refresh.enabled = true

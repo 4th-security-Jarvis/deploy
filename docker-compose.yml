@@ -34,6 +34,7 @@ services:
       - ./teleport-daemon/keys:/etc/keys:ro
       - ./teleport-daemon/data:/var/lib/teleport
       - tbot-certs-volume:/opt/machine-id
+      - ./4th-security-Jarvis-BE/identityDir:/opt
 
   # 3) Frontend - multi-stage build (build then serve with nginx)
   frontend:

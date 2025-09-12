@@ -168,9 +168,13 @@ sudo chmod 666 /var/run/docker.sock
 sudo chmod +x start_script.sh
 ./start_script.sh
 
+실행하기전에 teleport.yml 변수 치환(자동화 해야함)
+
 텔레포트 실행되면
 
 컨테이너 접속
 
 tctl create -f api-impersonator.yaml //역할생성
 유저생성
+최상위 인증서 생성
+도커 바깥으로 가지고 나오기

@@ -161,9 +161,16 @@ sudo certbot certonly --standalone \
 
 ./teleport-daemon/keys에 생성된 키파일 2개 붙여넣기
 
-sudo systemctl start docker // 안해도될까?
-sudo systemctl enable docker // 안해도될까?
+sudo systemctl start docker // 둘다 해야됨
+sudo systemctl enable docker
 sudo chmod 666 /var/run/docker.sock
 
 sudo chmod +x start_script.sh
 ./start_script.sh
+
+텔레포트 실행되면
+
+컨테이너 접속
+
+tctl create -f api-impersonator.yaml //역할생성
+유저생성

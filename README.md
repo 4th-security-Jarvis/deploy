@@ -171,10 +171,16 @@ sudo chmod +x start_script.sh
 실행하기전에 teleport.yml 변수 치환(자동화 해야함)
 
 텔레포트 실행되면
-
-컨테이너 접속
+컨테이너 접속 exec로
 
 tctl create -f api-impersonator.yaml //역할생성
-유저생성
-최상위 인증서 생성
-도커 바깥으로 가지고 나오기
+tctl users add jarvis --roles=api-impersonator
+tsh login --user=jarvis -o ./jarvis-service-identity --proxy install-test.duckdns.org:3080 --ttl=14400 --overwrite
+
+컨테이너 exit
+docker cp teleport-daemon:/jarvis-service-identity 4th-security-Jarvis-BE/identityDir/
+
+./start_script2.sh
+
+해야할일 - teleport.yaml 변수치환 자동화
+        VITE 환경변수에서 https 없에기

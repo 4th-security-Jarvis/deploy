@@ -7,6 +7,8 @@ services:
     container_name: teleport-daemon
     networks:
       - teleport-net
+    env_file:
+      - .env
     volumes:
       - ./teleport-daemon/config:/etc/teleport
       - ./teleport-daemon/data:/var/lib/teleport
@@ -14,7 +16,18 @@ services:
     ports:
       - "3025:3025"
       - "3080:3080"
-    entrypoint: [ "teleport", "start", "--config=/etc/teleport/teleport.yaml" ]
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        # .env 파일에서 VITE_API_URL 읽기
+        VITE_API_URL=$(printenv VITE_API_URL)
+
+        # teleport.yaml 파일 수정
+        sed -i "s|\${VITE_API_URL}|${VITE_API_URL}|g" /etc/teleport/teleport.yaml
+
+        # Teleport 시작
+        teleport start --config=/etc/teleport/teleport.yaml
 
   # 2) Backend - build from repo and run (uses the provided Dockerfile)
   backend:

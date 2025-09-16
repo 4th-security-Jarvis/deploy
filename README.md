@@ -145,42 +145,39 @@ https통신은 tls인증서가 필요하고 따라서 공인 ip와 도메인 네
 이를 위한 환경이 갖춰진 클라우드 환경을 가정하고 설명합니다.
 
 설치 가이드
-
-인스턴스 생성, 방화벽 설정(80,5601,8080,3080), 도메인 생성
-
 sudo apt-get update
+
 sudo apt-get install -y git,certbot,docker.io,docker-compose
+
 git clone https://github.com/4th-security-Jarvis/deploy.git
+
 cd deploy
+
 git submodule update --init
+
 .env파일 수정
-(gemini api 키, github sso, 조직생성)
+(github sso, 조직생성)
 
-sudo certbot certonly --standalone \
-  -d install-test.duckdns.org \
-  --non-interactive \
-  --agree-tos \
-  --email (본인꺼)
+sudo systemctl start docker
 
-./teleport-daemon/keys에 생성된 키파일 2개 붙여넣기
-
-sudo systemctl start docker // 둘다 해야됨
 sudo systemctl enable docker
+
 sudo chmod 666 /var/run/docker.sock
 
-sudo chmod +x start_script.sh
 ./start_script.sh
-
-실행하기전에 teleport.yml 변수 치환(자동화 해야함)
 
 텔레포트 실행되면
 컨테이너 접속 exec로
 
-tctl create -f api-impersonator.yaml //역할생성
+tctl create -f api-impersonator.yaml
+
 tctl users add jarvis --roles=api-impersonator
-tsh login --user=jarvis -o ./jarvis-service-identity --proxy install-test.duckdns.org:3080 --ttl=14400 --overwrite
+
+tsh login --user=jarvis -o ./jarvis-service-identity --proxy localhost:3080 --ttl=14400 --overwrite
 
 컨테이너 exit
-docker cp teleport-daemon:/jarvis-service-identity 4th-security-Jarvis-BE/identityDir/
+
+docker cp teleport-daemon:/jarvis-service-identity
+4th-security-Jarvis-BE/identityDir/
 
 ./start_script2.sh

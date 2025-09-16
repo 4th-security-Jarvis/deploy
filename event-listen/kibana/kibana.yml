@@ -8,6 +8,6 @@ xpack.security.encryptionKey: "933d2b48e7d7fe4e7b9d66fa6a1a5b17"
 
 server.host: "0.0.0.0"
 
-server.ssl.enabled: true
-server.ssl.certificate: /etc/keys/fullchain.pem
-server.ssl.key: /etc/keys/privkey.pem
+server.ssl.enabled: false
+# server.ssl.certificate: /etc/keys/fullchain.pem
+# server.ssl.key: /etc/keys/privkey.pem

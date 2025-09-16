@@ -15,6 +15,7 @@ if [ -z "$JOIN_TOKEN" ]; then
   exit 1
 fi
 
+sed -i '' '/^JOIN_TOKEN=/d' .env
 echo "JOIN_TOKEN=$JOIN_TOKEN" >> .env
 
 # 백엔드 서비스 시작
@@ -28,4 +29,4 @@ docker-compose up -d logstash elasticsearch kibana tp-event-handler
 
 # 프론트 서비스 시작
 
-docker-compose up -d frontend
+# docker-compose up -d frontend

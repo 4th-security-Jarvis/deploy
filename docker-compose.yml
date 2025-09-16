@@ -1,36 +1,21 @@
-version: '3.8'
-
 services:
   # 1) Teleport daemon (followed the user's example run command)
   teleport-daemon:
-    image: public.ecr.aws/gravitational/teleport-distroless-debug:17.5.4
     container_name: teleport-daemon
+    image: public.ecr.aws/gravitational/teleport-distroless-debug:17.5.4
     networks:
       - teleport-net
-    env_file:
-      - .env
     volumes:
       - ./teleport-daemon/config:/etc/teleport
       - ./teleport-daemon/data:/var/lib/teleport
-      - ./teleport-daemon/keys:/etc/keys:ro
     ports:
       - "3025:3025"
       - "3080:3080"
-    entrypoint:
-      - /bin/sh
-      - -c
-      - |
-        # .env 파일에서 VITE_API_URL 읽기
-        VITE_API_URL=$(printenv VITE_API_URL)
-
-        # teleport.yaml 파일 수정
-        sed -i "s|\${VITE_API_URL}|${VITE_API_URL}|g" /etc/teleport/teleport.yaml
-
-        # Teleport 시작
-        teleport start --config=/etc/teleport/teleport.yaml
+    entrypoint: [ "teleport", "start", "--config=/etc/teleport/teleport.yaml" ]
 
   # 2) Backend - build from repo and run (uses the provided Dockerfile)
   backend:
+    container_name: backend
     build:
       context: ./4th-security-Jarvis-BE
       dockerfile: Dockerfile
@@ -44,28 +29,28 @@ services:
     env_file:
       - .env
     volumes:
-      - ./teleport-daemon/keys:/etc/keys:ro
       - ./teleport-daemon/data:/var/lib/teleport
       - tbot-certs-volume:/opt/machine-id
       - ./4th-security-Jarvis-BE/identityDir:/opt
 
   # 3) Frontend - multi-stage build (build then serve with nginx)
-  frontend:
-    build:
-      context: ./4th-security-Jarvis-FE
-      dockerfile: Dockerfile
-    image: frontend:latest
-    depends_on:
-      - backend
-    networks:
-      - teleport-net
-    ports:
-      - "3000:80"
-    volumes:
-      - ./teleport-daemon/keys:/etc/keys:ro
+  # frontend:
+  #   build:
+  #     context: ./4th-security-Jarvis-FE
+  #     dockerfile: Dockerfile
+  #   image: frontend:latest
+  #   depends_on:
+  #     - backend
+  #   networks:
+  #     - teleport-net
+  #   ports:
+  #     - "3000:80"
+  #   volumes:
+  #     - ./teleport-daemon/keys:/etc/keys:ro
 
   # 4) ELK stack and event handler
   elasticsearch:
+    container_name: elastic
     image: docker.elastic.co/elasticsearch/elasticsearch:8.18.1
     environment:
       - discovery.type=single-node
@@ -77,31 +62,34 @@ services:
       - teleport-net
 
   logstash:
+    container_name: logstash
     image: docker.elastic.co/logstash/logstash:8.18.1
     volumes:
-      - ./logstash:/usr/share/logstash
-      - ./plugin:/home
+      - ./event-listen/logstash/config:/usr/share/logstash/config
+      - ./event-listen/logstash/pipeline:/usr/share/logstash/pipeline
+      - ./event-listen/plugin:/home
     networks:
       - teleport-net
     depends_on:
       - elasticsearch
 
   kibana:
+    container_name: kibana
     image: docker.elastic.co/kibana/kibana:8.18.1
     ports:
       - "5601:5601"
     volumes:
-      - ./kibana/kibana.yml:/usr/share/kibana/config/kibana.yml:ro
-      - ./teleport-daemon/keys:/etc/keys:ro
+      - ./event-listen/kibana/kibana.yml:/usr/share/kibana/config/kibana.yml:ro
     networks:
       - teleport-net
     depends_on:
       - elasticsearch
 
   tp-event-handler:
+    container_name: handler
     image: public.ecr.aws/gravitational/teleport-plugin-event-handler:17.7.1
     volumes:
-      - ./plugin:/opt/teleport-plugin
+      - ./event-listen/plugin:/opt/teleport-plugin
       - tbot-certs-volume:/opt/teleport-plugin/identity:ro
     working_dir: /opt/teleport-plugin
     networks:

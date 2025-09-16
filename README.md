@@ -140,9 +140,6 @@ docker-compose logs --tail 200 backend
 
 ---
 
-해당 서비스는 보안을 위해 https통신을 요구합니다
-https통신은 tls인증서가 필요하고 따라서 공인 ip와 도메인 네임이 필요하므로
-이를 위한 환경이 갖춰진 클라우드 환경을 가정하고 설명합니다.
 
 설치 가이드
 sudo apt-get update
@@ -181,3 +178,6 @@ docker cp teleport-daemon:/jarvis-service-identity
 4th-security-Jarvis-BE/identityDir/
 
 ./start_script2.sh
+
+해야할일 - teleport.yaml 변수치환 자동화
+        VITE 환경변수에서 https 없에기

@@ -19,7 +19,7 @@
 ## 설치 가이드
 sudo apt-get update
 
-sudo apt-get install -y git,certbot,docker.io,docker-compose
+sudo apt-get install -y git,docker.io,docker-compose
 
 git clone -b localdeploy https://github.com/4th-security-Jarvis/deploy.git
 

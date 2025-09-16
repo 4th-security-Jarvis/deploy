@@ -166,18 +166,12 @@ sudo chmod 666 /var/run/docker.sock
 텔레포트 실행되면
 컨테이너 접속 exec로
 
-tctl create -f api-impersonator.yaml
+tctl create -f ./etc/teleport/api-impersonator.yaml
 
 tctl users add jarvis --roles=api-impersonator
 
-tsh login --user=jarvis -o ./jarvis-service-identity --proxy localhost:3080 --ttl=14400 --overwrite
+tsh login --user=jarvis -o ./etc/teleport/jarvis-service-identity --proxy localhost:3080 --ttl=14400 --overwrite --insecure
 
 컨테이너 exit
 
-docker cp teleport-daemon:/jarvis-service-identity
-4th-security-Jarvis-BE/identityDir/
-
 ./start_script2.sh
-
-해야할일 - teleport.yaml 변수치환 자동화
-        VITE 환경변수에서 https 없에기

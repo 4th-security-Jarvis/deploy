@@ -163,12 +163,12 @@ sudo chmod 666 /var/run/docker.sock
 
 ./start_script.sh
 
-텔레포트 실행되면
-컨테이너 접속 exec로
+docker exec -it teleport-daemon sh
 
 tctl create -f ./etc/teleport/api-impersonator.yaml
 
 tctl users add jarvis --roles=api-impersonator
+여기에서 url의 도메인 부분을 localhost로 수정해야함
 
 tsh login --user=jarvis -o ./etc/teleport/jarvis-service-identity --proxy localhost:3080 --ttl=14400 --overwrite --insecure
 

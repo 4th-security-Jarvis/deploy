@@ -24,4 +24,4 @@ ssh_service:
     period: 1m0s
 proxy_service:
   enabled: "yes"
-  public_addr: "localhost:3080"
+  public_addr: "teleport-daemon:3080"

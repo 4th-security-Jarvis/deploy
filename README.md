@@ -146,7 +146,7 @@ sudo apt-get update
 
 sudo apt-get install -y git,certbot,docker.io,docker-compose
 
-git clone https://github.com/4th-security-Jarvis/deploy.git
+git clone -b localdeploy https://github.com/4th-security-Jarvis/deploy.git
 
 cd deploy
 

@@ -34,6 +34,7 @@ services:
 
   # 3) Frontend - multi-stage build (build then serve with nginx)
   frontend:
+    container_name: frontend
     build:
       context: ./4th-security-Jarvis-FE
       dockerfile: Dockerfile

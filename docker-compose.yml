@@ -33,19 +33,17 @@ services:
       - ./teleport-daemon/config:/opt
 
   # 3) Frontend - multi-stage build (build then serve with nginx)
-  # frontend:
-  #   build:
-  #     context: ./4th-security-Jarvis-FE
-  #     dockerfile: Dockerfile
-  #   image: frontend:latest
-  #   depends_on:
-  #     - backend
-  #   networks:
-  #     - teleport-net
-  #   ports:
-  #     - "3000:80"
-  #   volumes:
-  #     - ./teleport-daemon/keys:/etc/keys:ro
+  frontend:
+    build:
+      context: ./4th-security-Jarvis-FE
+      dockerfile: Dockerfile
+    image: frontend:latest
+    depends_on:
+      - backend
+    networks:
+      - teleport-net
+    ports:
+      - "3000:3000"
 
   # 4) ELK stack and event handler
   elasticsearch:
@@ -59,6 +57,11 @@ services:
       - esdata:/usr/share/elasticsearch/data
     networks:
       - teleport-net
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   logstash:
     container_name: logstash
@@ -70,7 +73,8 @@ services:
     networks:
       - teleport-net
     depends_on:
-      - elasticsearch
+      elasticsearch:
+        condition: service_healthy
 
   kibana:
     container_name: kibana

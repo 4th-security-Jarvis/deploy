@@ -29,4 +29,4 @@ docker-compose up -d logstash elasticsearch kibana tp-event-handler
 
 # 프론트 서비스 시작
 
-# docker-compose up -d frontend
+docker-compose up -d frontend

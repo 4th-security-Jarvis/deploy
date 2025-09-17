@@ -5,4 +5,4 @@
 [submodule "4th-security-Jarvis-FE"]
   path = 4th-security-Jarvis-FE
   url  = https://github.com/DguFarmSystem/4th-security-Jarvis-FE
-  branch = main
+  branch = localdeploy

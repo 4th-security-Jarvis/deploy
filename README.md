@@ -171,16 +171,21 @@ sudo chmod 666 /var/run/docker.sock
 sudo chmod +x start_script.sh
 ./start_script.sh
 
-실행하기전에 teleport.yml 변수 치환(자동화 해야함)
+실행하기전에 teleport.yml 변수 치환(자동화 해야함) 미완성(docker-compose.yml, teleport.yaml 수정해야됨)
 
 텔레포트 실행되면
 컨테이너 접속 exec로
 
-tctl create -f api-impersonator.yaml //역할생성
+tctl create -f /etc/teleport/api-impersonator.yaml //역할생성
 tctl users add jarvis --roles=api-impersonator
 tsh login --user=jarvis -o ./jarvis-service-identity --proxy install-test.duckdns.org:3080 --ttl=14400 --overwrite
 
 컨테이너 exit
 docker cp teleport-daemon:/jarvis-service-identity 4th-security-Jarvis-BE/identityDir/
+//identityDir 폴더 만들기
 
 ./start_script2.sh
+
+
+
+

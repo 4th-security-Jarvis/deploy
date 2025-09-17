@@ -7,6 +7,10 @@
 
 이 레포지토리는 Teleport 데몬과 백엔드(Go), 프론트엔드(React/Vite), 그리고 ELK(Elasticsearch / Logstash / Kibana)와 Teleport 이벤트 핸들러를 Docker Compose로 함께 띄우는 구성을 담고 있습니다.
 
+## 요구사항
+
+관리자 계정 등록을 위해
+핸드폰에 opt인증앱이 필요합니다.
 
 ## GitHub SSO (OAuth 앱) 등록 요약
 

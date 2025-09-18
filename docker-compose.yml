@@ -44,7 +44,7 @@ services:
     networks:
       - teleport-net
     ports:
-      - "3000:3000"
+      - "3000:5173"
 
   # 4) ELK stack and event handler
   elasticsearch:
